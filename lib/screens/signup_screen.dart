@@ -1,10 +1,13 @@
-import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_clone/resources/auth_method.dart';
+import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
+import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
+import 'package:instagram_clone/responsive/web_screen_layout.dart';
+import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/util/color.dart';
 import 'package:instagram_clone/util/util.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
@@ -16,7 +19,7 @@ class SignUpScreen extends StatefulWidget {
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen> with AuthMethods {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
@@ -37,6 +40,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       _image = image;
     });
+  }
+
+  void signUpUser() async {
+    String res = await signupUser(
+        email: _emailController.text,
+        password: _passwordController.text,
+        username: _usernamedController.text,
+        bio: _bioController.text,
+        file: _image!);
+
+    if (res != 'Success') {
+      showSnackbar(res, context);
+    } else {
+      showSnackbar("Success fully sign up", context);
+
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => ResponsiveLayout(
+              webScreenLayout: WebScreenlayout(),
+              mobileScreenLayout: MobileScreenlayout())));
+      // Navigator.of(context).pushReplacement(
+      // MaterialPageRoute(builder: (context) => LoginScreen()));
+    }
   }
 
   @override
@@ -116,14 +141,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 height: 64,
               ),
               InkWell(
-                onTap: () async {
-                  await AuthMethods().signupUser(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                      username: _usernamedController.text,
-                      bio: _bioController.text,
-                      file: _image!);
-                },
+                onTap: () => signUpUser(),
                 child: Container(
                   child: Text('Sign up'),
                   width: double.infinity,
@@ -149,7 +167,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Text("Don't have a account ?"),
                       padding: EdgeInsets.symmetric(vertical: 8)),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => LoginScreen()));
+                    },
                     child: Container(
                         child: Text(
                           "Don't have a account",
