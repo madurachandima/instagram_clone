@@ -35,4 +35,10 @@ class FireStoreMethods extends StorageMethods {
       return "Somthinf went to wrong";
     }
   }
+
+  Future<void> likePost(String postId, String uid, List likes) async {
+    try {} catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 }
